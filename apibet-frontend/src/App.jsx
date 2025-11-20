@@ -1,3 +1,4 @@
+// src/App.jsx
 import React, { useEffect, useState } from "react";
 import GameCard from "./components/GameCard";
 import GameDetails from "./components/GameDetails";
@@ -12,8 +13,12 @@ const App = () => {
   useEffect(() => {
     const fetchJogos = async () => {
       try {
-        const res = await axios.get("/api/jogo-live");
-        setJogos(res.data.jogos || []);
+        const res = await axios.get("http://localhost:3001/jogo-live");
+        if (res.data.ok && res.data.total > 0) {
+          setJogos(res.data.jogos);
+        } else {
+          setJogos([]);
+        }
       } catch (err) {
         console.error(err);
         setError("Erro ao buscar jogos ao vivo.");
@@ -25,26 +30,51 @@ const App = () => {
     fetchJogos();
   }, []);
 
-  if (loading) return <p>Carregando jogos...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading)
+    return (
+      <div style={styles.container}>
+        <p>Carregando jogos...</p>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div style={styles.container}>
+        <p style={{ color: "red" }}>{error}</p>
+      </div>
+    );
 
   return (
-    <div style={{ padding: "16px" }}>
+    <div style={styles.container}>
       <h1>Jogos ao Vivo</h1>
+
       {jogos.length === 0 ? (
-        <GameCard
-          game={{
-            homeTeam: "Nenhum jogo",
-            awayTeam: "no momento",
-            status: "-",
-            homeScore: "-",
-            awayScore: "-",
-          }}
-        />
+        <p>Não há jogos disponíveis no momento.</p>
       ) : (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+        <div style={styles.cardsContainer}>
           {jogos.map((game) => (
-            <GameCard key={game.id} game={game} onClick={setSelectedGame} />
+            <GameCard
+              key={game.id}
+              game={{
+                id: game.id,
+                homeTeam: game.timeA,
+                awayTeam: game.timeB,
+                homeScore: game.placarA,
+                awayScore: game.placarB,
+                status: game.status,
+                corners: game.estatisticas?.corners || 0,
+                possession: game.estatisticas?.posse?.timeA || 0,
+                shots: game.estatisticas?.chutes || {},
+                passes: game.estatisticas?.passes || {},
+                cards: game.estatisticas?.cartoes || {},
+                saves: game.estatisticas?.saves || 0,
+                substitutions: game.estatisticas?.substituicoes || [],
+                odds: game.odds || {},
+                lineups: game.lineups || {},
+                events: game.events || [],
+              }}
+              onClick={setSelectedGame}
+            />
           ))}
         </div>
       )}
@@ -58,5 +88,24 @@ const App = () => {
     </div>
   );
 };
-//atualizaei
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center", // vertical center
+    alignItems: "center", // horizontal center
+    minHeight: "100vh",
+    padding: "20px",
+    textAlign: "center",
+  },
+  cardsContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "16px",
+    justifyContent: "center", // centraliza os cards
+    marginTop: "20px",
+  },
+};
+
 export default App;

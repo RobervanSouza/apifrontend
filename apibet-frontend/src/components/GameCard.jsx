@@ -1,4 +1,3 @@
-// src/components/GameCard.jsx
 import React from "react";
 
 const GameCard = ({ game, onClick }) => {
@@ -8,18 +7,23 @@ const GameCard = ({ game, onClick }) => {
       style={{
         border: "1px solid #ccc",
         borderRadius: "8px",
-        padding: "16px",
-        margin: "8px",
+        padding: "20px",
+        margin: "12px",
         cursor: "pointer",
-        width: "250px",
-        boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
-      }}>
+        width: "280px",
+        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+        textAlign: "center",
+        backgroundColor: "#fff",
+        transition: "transform 0.2s",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+      onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}>
       <h3>
         {game.homeTeam} vs {game.awayTeam}
       </h3>
-      <p>Status: {game.status}</p>
+      <p>Status: {game.status || "Não disponível"}</p>
       <p>
-        Score: {game.homeScore} - {game.awayScore}
+        Score: {game.homeScore ?? 0} - {game.awayScore ?? 0}
       </p>
     </div>
   );
