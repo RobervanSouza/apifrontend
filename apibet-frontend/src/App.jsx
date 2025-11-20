@@ -12,7 +12,6 @@ const App = () => {
   useEffect(() => {
     const fetchJogos = async () => {
       try {
-        // Chama a função serverless
         const res = await axios.get("/api/jogo-live");
         setJogos(res.data.jogos || []);
       } catch (err) {
@@ -28,16 +27,27 @@ const App = () => {
 
   if (loading) return <p>Carregando jogos...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
-  if (jogos.length === 0) return <p>Não há jogos disponíveis no momento.</p>;
 
   return (
     <div style={{ padding: "16px" }}>
       <h1>Jogos ao Vivo</h1>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
-        {jogos.map((game) => (
-          <GameCard key={game.id} game={game} onClick={setSelectedGame} />
-        ))}
-      </div>
+      {jogos.length === 0 ? (
+        <GameCard
+          game={{
+            homeTeam: "Nenhum jogo",
+            awayTeam: "no momento",
+            status: "-",
+            homeScore: "-",
+            awayScore: "-",
+          }}
+        />
+      ) : (
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+          {jogos.map((game) => (
+            <GameCard key={game.id} game={game} onClick={setSelectedGame} />
+          ))}
+        </div>
+      )}
 
       {selectedGame && (
         <div style={{ marginTop: "32px" }}>
